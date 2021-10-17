@@ -1,0 +1,18 @@
+#################################################
+CONDA INSTALLATIONS:
+conda install -c anaconda openpyxl
+conda install -c conda-forge opencv
+conda install -c pytorch pytorch
+conda install -c conda-forge moviepy
+conda install -c conda-forge pysimplegui
+
+##################################################
+PIP INSTALLATIONS:
+pip install opencv-contrib-python
+!apt-get -qq install -y libsm6 libxext6
+pip install -q -U opencv-python
+pip install openpyxl
+
+##################################################
+MANDATORY:
+pip install facenet-pytorch --quiet
