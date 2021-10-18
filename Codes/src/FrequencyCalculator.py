@@ -11,8 +11,7 @@ import statistics
 def plot(arr):
     x = np.arange(1, len(arr) + 1, 1)
     y = arr
-    plt.scatter(x, y, label="Sweep duration", color="green",
-                marker="*", s=20)
+    plt.scatter(x, y, label="Sweep duration", color="green", marker="*", s=20)
     # x-axis label
     plt.xlabel('Sweep Number')
     # frequency label
@@ -21,7 +20,6 @@ def plot(arr):
     plt.title('Sweep Durations')
     # showing legend
     plt.legend()
-
     # function to show the plot
     plt.show()
 
@@ -150,15 +148,15 @@ def FrequencyCalculation(Filename, threshold, thresh_iterations, visual_area, di
             r = right.flatten().sum(axis=0)
             activation = 1000
             if (r > l) and (r > activation):
-                if disp: print("Right", "R:", r, "  L:", l, "   Difference:", abs(r - l),
-                               "Previous direction:", arr[-1])
+                if disp:
+                    print("Right", "R:", r, "  L:", l, "   Difference:", abs(r - l), "Previous direction:", arr[-1])
                 arr = np.append(arr, "R ")
                 if disp:
                     plt.imshow(image)
                     plt.show()
             elif (l > r) and (l > activation):
-                if disp: print("Left", "R:", r, "  L:", l, "   Difference:", abs(r - l),
-                               "Previous direction:", arr[-1])
+                if disp:
+                    print("Left", "R:", r, "  L:", l, "   Difference:", abs(r - l), "Previous direction:", arr[-1])
                 arr = np.append(arr, "L ")
                 if disp:
                     plt.imshow(image)

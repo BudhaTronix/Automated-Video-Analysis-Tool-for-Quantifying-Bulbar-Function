@@ -6,7 +6,7 @@ from facenet_pytorch import MTCNN
 
 
 def LipExtraction(Filename, New_Filename, correctionFactor):
-    print("Input File name : ", Filename)
+    print("Input File name  : ", Filename)
     print("Output File name : ", New_Filename)
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     cf = correctionFactor
@@ -82,7 +82,7 @@ def LipExtraction(Filename, New_Filename, correctionFactor):
             out.write(cv2.resize(crop_img, shape))
         else:
             break
-            # Close windows
+    # Close windows
     cap2.release()
     cap.release()
     out.release()

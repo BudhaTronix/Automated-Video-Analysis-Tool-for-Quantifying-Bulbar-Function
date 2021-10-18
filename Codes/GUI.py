@@ -1,11 +1,10 @@
 import json
 import tkinter as tk
-from Pipeline import callStabilize, callCompress, callFaceDetect, callLipExtraction, callTongueTrack, callConfigEditor, \
-    callPerformAll
+from Pipeline import callStabilize, callCompress, callFaceDetect, callLipExtraction, callTongueTrack, callConfigEditor
 
 
 def a():
-    callStabilize(MainFile, SMOOTHING_RADIUS)
+    callStabilize(MainFile)
 
 
 def b():
@@ -21,7 +20,7 @@ def d():
 
 
 def e():
-    callTongueTrack(MainFile, threshold,thresh_iterations, disp,visual_area, time_slice, model, save_in_excel)
+    callTongueTrack(MainFile, threshold, thresh_iterations, disp, visual_area, time_slice, model, save_in_excel)
 
 
 def f():

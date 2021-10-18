@@ -4,7 +4,7 @@ from facenet_pytorch import MTCNN
 
 
 def FaceExtraction(Filename, New_Filename, correctionFactor):
-    print("Input File name : ", Filename)
+    print("Input File name  : ", Filename)
     print("Output File name : ", New_Filename)
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -12,7 +12,7 @@ def FaceExtraction(Filename, New_Filename, correctionFactor):
     mtcnn = MTCNN(margin=40, select_largest=False, post_process=False, device=device)
 
     cap = cv2.VideoCapture(Filename)
-    fps = cap.get(cv2.CAP_PROP_FPS)
+    # fps = cap.get(cv2.CAP_PROP_FPS)
     Y1 = Y2 = X1 = X2 = 0
 
     n_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))

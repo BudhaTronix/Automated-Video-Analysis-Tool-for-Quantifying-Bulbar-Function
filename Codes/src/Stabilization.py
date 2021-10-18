@@ -2,40 +2,43 @@ import cv2
 import sys
 import numpy as np
 
+
 # Calculating Moving Average
 def movingAverage(curve, radius):
-  window_size = 2 * radius + 1
-  # Define the filter
-  f = np.ones(window_size)/window_size
-  # Add padding to the boundaries
-  curve_pad = np.lib.pad(curve, (radius, radius), 'edge')
-  # Apply convolution
-  curve_smoothed = np.convolve(curve_pad, f, mode='same')
-  # Remove padding
-  curve_smoothed = curve_smoothed[radius:-radius]
-  # return smoothed curve
-  return curve_smoothed
+    window_size = 2 * radius + 1
+    # Define the filter
+    f = np.ones(window_size) / window_size
+    # Add padding to the boundaries
+    curve_pad = np.lib.pad(curve, (radius, radius), 'edge')
+    # Apply convolution
+    curve_smoothed = np.convolve(curve_pad, f, mode='same')
+    # Remove padding
+    curve_smoothed = curve_smoothed[radius:-radius]
+    # return smoothed curve
+    return curve_smoothed
+
 
 def fixBorder(frame):
-  s = frame.shape
-  # Scale the image 4% without moving the center
-  T = cv2.getRotationMatrix2D((s[1]/2, s[0]/2), 0, 1.04)
-  frame = cv2.warpAffine(frame, T, (s[1], s[0]))
-  return frame
+    s = frame.shape
+    # Scale the image 4% without moving the center
+    T = cv2.getRotationMatrix2D((s[1] / 2, s[0] / 2), 0, 1.04)
+    frame = cv2.warpAffine(frame, T, (s[1], s[0]))
+    return frame
+
 
 # Calculating the smooth trajectory
 def smooth(trajectory):
-  smoothed_trajectory = np.copy(trajectory)
-  # Filter the x, y and angle curves
-  for i in range(3):
-    smoothed_trajectory[:,i] = movingAverage(trajectory[:,i], radius=SMOOTHING_RADIUS)
+    smoothed_trajectory = np.copy(trajectory)
+    # Filter the x, y and angle curves
+    for i in range(3):
+        smoothed_trajectory[:, i] = movingAverage(trajectory[:, i], radius=SMOOTHING_RADIUS)
 
-  return smoothed_trajectory
+    return smoothed_trajectory
 
 
 def Stabilization(Filename, New_Filename):
-    print("Input File name : ", Filename)
-    print("Ouput File name : ", New_Filename)
+    print("Input File name  : ", Filename)
+    print("Output File name : ", New_Filename)
     # Read input video
     cap = cv2.VideoCapture(Filename)
 
@@ -62,14 +65,14 @@ def Stabilization(Filename, New_Filename):
     prev_gray = cv2.cvtColor(prev, cv2.COLOR_BGR2GRAY)
 
     # Pre-define transformation-store array
-    transforms = np.zeros((n_frames -1, 3), np.float32)
+    transforms = np.zeros((n_frames - 1, 3), np.float32)
     # sys.stdout.write('['+' '*(n_frames-2)+']')
-    sys.stdout.write('[ ' +'  ' *(100 -2 ) +']')
+    sys.stdout.write('[ ' + '  ' * (100 - 2) + ']')
     # moved *11 on account of ]
-    sys.stdout.write('\b ' *(100 -1))
+    sys.stdout.write('\b ' * (100 - 1))
     sys.stdout.flush()
     x = int(n_frames / 100)
-    for i in range(n_frames -2):
+    for i in range(n_frames - 2):
         # Detect feature points in previous frame
         prev_pts = cv2.goodFeaturesToTrack(prev_gray,
                                            maxCorners=200,
@@ -92,37 +95,31 @@ def Stabilization(Filename, New_Filename):
         assert prev_pts.shape == curr_pts.shape
 
         # Filter only valid points
-        idx = np.where(status==1)[0]
+        idx = np.where(status == 1)[0]
         prev_pts = prev_pts[idx]
         curr_pts = curr_pts[idx]
 
         # Find transformation matrix
         # m = cv2.estimateRigidTransform(prev_pts, curr_pts, fullAffine=False) #will only work with OpenCV-3 or less
         m = cv2.estimateAffinePartial2D(prev_pts, curr_pts)[0]
-        # print(m.shape())
-        # print(m)
+
         # Extract traslation
-        dx = m[0 ,2]
-        dy = m[1 ,2]
+        dx = m[0, 2]
+        dy = m[1, 2]
 
         # Extract rotation angle
-        da = np.arctan2(m[1 ,0], m[0 ,0])
+        da = np.arctan2(m[1, 0], m[0, 0])
 
         # Store transformation
-        transforms[i] = [dx ,dy ,da]
+        transforms[i] = [dx, dy, da]
 
         # Move to next frame
         prev_gray = curr_gray
 
-        # print("Frame: " + str(i) +  "/" + str(n_frames) + " -  Tracked points : " + str(len(prev_pts)))
-        # print("Stabilzed : ", int(((i+1)/n_frames)*100), "%")
-        # time.sleep(0.1)
-        if (i % x == 0):
+        if i % x == 0:
             sys.stdout.write('#')
             sys.stdout.flush()
-    # sys.stdout.write('] Stabilization Completed!\n')
-    # print("Stabilzed : ", int(((i+2)/n_frames)*100), "%")
-    # print("Stabilzed : ", ((i+3)/n_frames)*100, "%")
+
     # Compute trajectory using cumulative sum of transformations
     trajectory = np.cumsum(transforms, axis=0)
 
@@ -139,40 +136,33 @@ def Stabilization(Filename, New_Filename):
     cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
     # Write n_frames-1 transformed frames
-    for i in range(n_frames -2):
+    for i in range(n_frames - 2):
         # Read next frame
         success, frame = cap.read()
         if not success:
             break
 
         # Extract transformations from the new transformation array
-        dx = transforms_smooth[i ,0]
-        dy = transforms_smooth[i ,1]
-        da = transforms_smooth[i ,2]
+        dx = transforms_smooth[i, 0]
+        dy = transforms_smooth[i, 1]
+        da = transforms_smooth[i, 2]
 
         # Reconstruct transformation matrix accordingly to new values
-        m = np.zeros((2 ,3), np.float32)
-        m[0 ,0] = np.cos(da)
-        m[0 ,1] = -np.sin(da)
-        m[1 ,0] = np.sin(da)
-        m[1 ,1] = np.cos(da)
-        m[0 ,2] = dx
-        m[1 ,2] = dy
+        m = np.zeros((2, 3), np.float32)
+        m[0, 0] = np.cos(da)
+        m[0, 1] = -np.sin(da)
+        m[1, 0] = np.sin(da)
+        m[1, 1] = np.cos(da)
+        m[0, 2] = dx
+        m[1, 2] = dy
 
         # Apply affine wrapping to the given frame
-        frame_stabilized = cv2.warpAffine(frame, m, (w ,h))
+        frame_stabilized = cv2.warpAffine(frame, m, (w, h))
 
         # Fix border artifacts
         frame_stabilized = fixBorder(frame_stabilized)
         frame_out = frame_stabilized
-        # Write the frame to the file
-        # frame_out = cv2.hconcat([frame, frame_stabilized])
 
-        # If the image is too big, resize it.
-        # if(frame_out.shape[1] > 1920):
-        # frame_out = cv2.resize(frame_out, (int(frame_out.shape[1]/2), int(frame_out.shape[0]/2)))
-
-        # cv2.imshow("Before and After", frame_out)
         cv2.waitKey(10)
         out.write(frame_out)
     sys.stdout.write('] 100%!\n')

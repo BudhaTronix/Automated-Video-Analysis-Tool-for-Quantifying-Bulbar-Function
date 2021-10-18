@@ -1,15 +1,13 @@
 import os
+import datetime
 
 from os import path
 from openpyxl import load_workbook
-import datetime
 from Codes.src.Stabilization import Stabilization
 from Codes.src.VideoCompression import VideoCompression
 from Codes.src.FaceExtraction import FaceExtraction
 from Codes.src.LipExtraction import LipExtraction
 from Codes.src.FrequencyCalculator import FrequencyCalculation
-from StartUI import loaderFunc
-from GUI import GUI
 
 
 def excelUpadter(timestamp, filename, time_slice, frequency_total, errors, sweeps_mode, time_mode, sweeps_mean
@@ -22,7 +20,6 @@ def excelUpadter(timestamp, filename, time_slice, frequency_total, errors, sweep
 
     max_column = sheet.max_column
     max_row = sheet.max_row
-    # print(sheet.cell(row=1, column=1).value)
     sheet.cell(row=max_row + 1, column=1).value = timestamp
     sheet.cell(row=max_row + 1, column=2).value = filename.split("_")[0]
     sheet.cell(row=max_row + 1, column=3).value = time_slice
@@ -33,7 +30,6 @@ def excelUpadter(timestamp, filename, time_slice, frequency_total, errors, sweep
     sheet.cell(row=max_row + 1, column=8).value = time_mode
     sheet.cell(row=max_row + 1, column=9).value = time_mean
     sheet.cell(row=max_row + 1, column=10).value = stdev
-    # print(sheet.cell(row=1, column=1).value)
 
     workbook.save(ExcelFile)
 
@@ -63,8 +59,9 @@ def callCompress(MainFile):
         Filename = MainFile.split(".")[0] + "_Stabilized.mp4"
     else:
         Filename = MainFile
-    VideoCompression(Filename, New_FileName)
-    print("Video Compression Done..\n")
+    compress = VideoCompression(Filename, New_FileName)
+    if compress:
+        print("Video Compression Done..\n")
 
 
 def callFaceDetect(MainFile, correctionFactor_Face):
@@ -103,10 +100,13 @@ def callLipExtraction(MainFile, correctionFactor_Lip):
 
 def callTongueTrack(MainFile, threshold, thresh_iterations, disp, visual_area, time_slice, model, save_in_excel):
     print("###############Frequency Calculation####################\n")
+    Filename = ""
     if path.exists(MainFile.split(".")[0] + "_LipDetector.mp4"):
         Filename = MainFile.split(".")[0] + "_LipDetector.mp4"
     elif path.exists(MainFile.split(".")[0] + "_FaceDetector.mp4"):
         Filename = MainFile.split(".")[0] + "_FaceDetector.mp4"
+    else:
+        print("File does not exist")
     frequency_total, errors, sweeps_mode, sweeps_mean, stdev, fps, time_slice = FrequencyCalculation(Filename
                                                                                                      , threshold,
                                                                                                      thresh_iterations,
@@ -139,8 +139,7 @@ def callPerformAll():
 
 
 def CUI(MainFile, Stabilize, Video_Compression,
-        Face_Extract, Lip_Extraction, Frquency_Calculation,
-        SMOOTHING_RADIUS, threshold, thresh_iterations, visual_area,
+        Face_Extract, Lip_Extraction, Frquency_Calculation, threshold, thresh_iterations, visual_area,
         disp, correctionFactor_Face, correctionFactor_Lip, save_in_excel, time_slice, model):
     # Call Stabilization
     print(
@@ -148,7 +147,7 @@ def CUI(MainFile, Stabilize, Video_Compression,
         (Stabilize, Video_Compression, Face_Extract, Lip_Extraction, Frquency_Calculation))
     print("\n")
     if Stabilize:
-        callStabilize(MainFile, SMOOTHING_RADIUS)
+        callStabilize(MainFile)
 
     # Call Video Compression
     if Video_Compression:
