@@ -4,8 +4,7 @@ from Pipeline import CUI
 
 
 def main():
-    # model = load_model("../model_weights/final_model.h5", compile=False)
-    model = ""
+    model = load_model("../model_weights/final_model.h5", compile=False)
     # Global Variable Declaration
     use_GUI = False
     SMOOTHING_RADIUS = 50

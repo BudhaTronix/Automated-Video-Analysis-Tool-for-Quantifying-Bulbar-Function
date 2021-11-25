@@ -15,7 +15,7 @@ def excelUpadter(timestamp, filename, time_slice, frequency_total, errors, sweep
     ExcelFile = "Frequency.xlsx"
 
     workbook = load_workbook(ExcelFile)
-    # workbook.sheetnames
+
     sheet = workbook.active
 
     max_column = sheet.max_column
