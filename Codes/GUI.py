@@ -1,7 +1,6 @@
 import json
 import PySimpleGUI as sg
-from Pipeline import callStabilize, callFaceDetect, callLipExtraction, callTongueTrack, callCompress
-
+from Pipeline import pipeline
 
 class GUI:
     def __init__(self, model):
@@ -65,6 +64,8 @@ class GUI:
             json.dump(values, outfile)
 
     def loaderFunc(self):
+        obj = pipeline()
+
         t_len = 22
 
         preProc = [[sg.Button(size=(t_len, 4), button_text="Stabilize Video", ),
@@ -92,16 +93,16 @@ class GUI:
         if button == "Edit Configuration":
             self.configEditor()
         elif button == "Compress Video":
-            callCompress(MainFile)
+            obj.callCompress(MainFile)
         elif button == "Stabilize Video":
-            callStabilize(MainFile, SMOOTHING_RADIUS)
+            obj.callStabilize(MainFile, SMOOTHING_RADIUS)
         elif button == "Perform Face Extraction":
-            callFaceDetect(MainFile, correctionFactor_Face)
+            obj.callFaceDetect(MainFile, correctionFactor_Face)
         elif button == "Perform Lip Extraction":
-            callLipExtraction(MainFile, correctionFactor_Lip)
+            obj.callLipExtraction(MainFile, correctionFactor_Lip)
         elif button == "Perform Tongue Movement Analysis":
-            callTongueTrack(MainFile, threshold, thresh_iterations, disp, visual_area, time_slice,
-                            self.model, save_in_excel)
+            obj.callTongueTrack(MainFile, threshold, thresh_iterations, disp, visual_area, time_slice, self.model,
+                                save_in_excel)
         window.close()
         if button is not None:
             self.loaderFunc()
