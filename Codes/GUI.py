@@ -2,10 +2,10 @@ import json
 import PySimpleGUI as sg
 from Pipeline import callStabilize, callFaceDetect, callLipExtraction, callTongueTrack, callCompress
 
+
 class GUI:
     def __init__(self, model):
         self.model = model
-
 
     def readJSON(self):
         with open('temp.json', 'r') as openfile:
@@ -78,8 +78,8 @@ class GUI:
                   [sg.Frame('Feature Extraction', FeatureExtrac, title_color='white', font='Any 12')],
                   [sg.Frame('Analysis', Analysis, title_color='white', font='Any 12')], ]
 
-        window = sg.Window('Automated Tongue Tracking Tool', font=("Helvetica", 12), element_justification='center').Layout(
-            layout)
+        window = sg.Window('Automated Tongue Tracking Tool', font=("Helvetica", 12),
+                           element_justification='center').Layout(layout)
 
         button, values = window.Read()
 
