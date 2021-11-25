@@ -13,12 +13,9 @@ from Codes.src.FrequencyCalculator import FrequencyCalculation
 def excelUpadter(timestamp, filename, time_slice, frequency_total, errors, sweeps_mode, time_mode, sweeps_mean
                  , time_mean, stdev):
     ExcelFile = "Frequency.xlsx"
-
     workbook = load_workbook(ExcelFile)
-
     sheet = workbook.active
-
-    max_column = sheet.max_column
+    # max_column = sheet.max_column
     max_row = sheet.max_row
     sheet.cell(row=max_row + 1, column=1).value = timestamp
     sheet.cell(row=max_row + 1, column=2).value = filename.split("_")[0]
@@ -34,7 +31,7 @@ def excelUpadter(timestamp, filename, time_slice, frequency_total, errors, sweep
     workbook.save(ExcelFile)
 
 
-def callStabilize(MainFile):
+def callStabilize(MainFile, SMOOTHING_RADIUS):
     print("Starting Video Stabilization..\n")
     Filename = ""
     New_FileName = MainFile.split(".")[0] + "_Stabilized.mp4"
@@ -45,7 +42,7 @@ def callStabilize(MainFile):
         Filename = MainFile
     else:
         print("File Not Found")
-    Stabilization(Filename, New_FileName)
+    Stabilization(Filename, New_FileName, SMOOTHING_RADIUS)
     print("Video Stabilization Done..\n")
 
 
@@ -124,30 +121,25 @@ def callTongueTrack(MainFile, threshold, thresh_iterations, disp, visual_area, t
     print("#############Frequency Calcualtion Ends###############\n")
 
 
-def callConfigEditor():
-    print("Starting to Calculate Speed..\n")
-    # loaderFunc()
-    print("Speed Calculation Done..\n\n")
 
-
-def callPerformAll():
+def callPerformAll(MainFile,SMOOTHING_RADIUS, threshold, thresh_iterations, visual_area, disp,
+                   correctionFactor_Face, correctionFactor_Lip, model):
     print("Starting....\n")
     CUI(MainFile, True, True, True, True, True, SMOOTHING_RADIUS, threshold, thresh_iterations, visual_area, disp
         , correctionFactor_Face, correctionFactor_Lip, model)
-    # os.system('python Controller')
     print("Done!\n\n")
 
 
 def CUI(MainFile, Stabilize, Video_Compression,
         Face_Extract, Lip_Extraction, Frquency_Calculation, threshold, thresh_iterations, visual_area,
-        disp, correctionFactor_Face, correctionFactor_Lip, save_in_excel, time_slice, model):
+        disp, correctionFactor_Face, correctionFactor_Lip, save_in_excel, time_slice, model, SMOOTHING_RADIUS):
     # Call Stabilization
     print(
         "Stabilization = {},Video_Compression = {},Face_Extraction = {},Lip_Extraction = {},Frequency_Calculation = {}".format
         (Stabilize, Video_Compression, Face_Extract, Lip_Extraction, Frquency_Calculation))
     print("\n")
     if Stabilize:
-        callStabilize(MainFile)
+        callStabilize(MainFile, SMOOTHING_RADIUS)
 
     # Call Video Compression
     if Video_Compression:
@@ -164,3 +156,4 @@ def CUI(MainFile, Stabilize, Video_Compression,
     # Call Frequency Calculation
     if Frquency_Calculation:
         callTongueTrack(MainFile, threshold, thresh_iterations, disp, visual_area, time_slice, model, save_in_excel)
+

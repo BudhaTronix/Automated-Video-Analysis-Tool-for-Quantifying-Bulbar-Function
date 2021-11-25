@@ -1,12 +1,13 @@
 import cv2
-import torch
+# import torch
 from facenet_pytorch import MTCNN
 
 
 def FaceExtraction(Filename, New_Filename, correctionFactor):
     print("Input File name  : ", Filename)
     print("Output File name : ", New_Filename)
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    # device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    device = "cpu"
 
     print('Running on device: {}'.format(device))
     mtcnn = MTCNN(margin=40, select_largest=False, post_process=False, device=device)

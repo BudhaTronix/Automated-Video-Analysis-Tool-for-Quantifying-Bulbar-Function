@@ -27,7 +27,7 @@ def fixBorder(frame):
 
 
 # Calculating the smooth trajectory
-def smooth(trajectory):
+def smooth(trajectory, SMOOTHING_RADIUS):
     smoothed_trajectory = np.copy(trajectory)
     # Filter the x, y and angle curves
     for i in range(3):
@@ -36,7 +36,7 @@ def smooth(trajectory):
     return smoothed_trajectory
 
 
-def Stabilization(Filename, New_Filename):
+def Stabilization(Filename, New_Filename, SMOOTHING_RADIUS):
     print("Input File name  : ", Filename)
     print("Output File name : ", New_Filename)
     # Read input video
@@ -124,7 +124,7 @@ def Stabilization(Filename, New_Filename):
     trajectory = np.cumsum(transforms, axis=0)
 
     # Create variable to store smoothed trajectory
-    smoothed_trajectory = smooth(trajectory)
+    smoothed_trajectory = smooth(trajectory,SMOOTHING_RADIUS)
 
     # Calculate difference in smoothed_trajectory and trajectory
     difference = smoothed_trajectory - trajectory

@@ -1,12 +1,12 @@
 import glob
-from keras.models import load_model
 from Pipeline import CUI
+from keras.models import load_model
 
 
 def main():
-    model = load_model("../model_weights/final_model.h5", compile=False)
+    model = load_model('final_model.h5', compile=False)
     # Global Variable Declaration
-    use_GUI = False
+    use_GUI = True
     SMOOTHING_RADIUS = 50
     visual_area = 0  #
     correctionFactor_Face = 30
@@ -16,12 +16,13 @@ def main():
     disp = False
     save_in_excel = True
     time_slice = 5
-    MainFile = "37a.mov"  # Change When needed
+    MainFile = "C:\\Users\\budha\\PycharmProjects\\TongueFrequencyCalculator\\VideoFies\\37a.mov"  # Change When needed
     # Change it to True if you want Stabilization
     if use_GUI:
         from GUI import GUI
-        GUI(MainFile, SMOOTHING_RADIUS, threshold, thresh_iterations, visual_area, disp, correctionFactor_Face,
-            correctionFactor_Lip, save_in_excel, time_slice, model)
+        obj = GUI(model)
+        obj.loaderFunc()
+
     else:
         Stabilize = False
 
@@ -64,8 +65,8 @@ def main():
                 correctionFactor_Lip,
                 save_in_excel,
                 time_slice,
-                model)
+                model,SMOOTHING_RADIUS)
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+main()
