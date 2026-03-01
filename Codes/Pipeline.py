@@ -1,18 +1,43 @@
-import os
 import datetime
-
+import os
 from os import path
-from openpyxl import load_workbook
-from Codes.src.Stabilization import Stabilization
-from Codes.src.VideoCompression import VideoCompression
-from Codes.src.FaceExtraction import FaceExtraction
-from Codes.src.LipExtraction import LipExtraction
-from Codes.src.FrequencyCalculator import FrequencyCalculation
+
+
+def _load_stabilization():
+    from Codes.src.Stabilization import Stabilization
+
+    return Stabilization
+
+
+def _load_video_compression():
+    from Codes.src.VideoCompression import VideoCompression
+
+    return VideoCompression
+
+
+def _load_face_extraction():
+    from Codes.src.FaceExtraction import FaceExtraction
+
+    return FaceExtraction
+
+
+def _load_lip_extraction():
+    from Codes.src.LipExtraction import LipExtraction
+
+    return LipExtraction
+
+
+def _load_frequency_calculation():
+    from Codes.src.FrequencyCalculator import FrequencyCalculation
+
+    return FrequencyCalculation
 
 
 class pipeline:
     def excelUpadter(self, timestamp, filename, time_slice, frequency_total, errors, sweeps_mode, time_mode, sweeps_mean
                      , time_mean, stdev):
+        from openpyxl import load_workbook
+
         ExcelFile = "Frequency.xlsx"
         workbook = load_workbook(ExcelFile)
         sheet = workbook.active
@@ -42,6 +67,7 @@ class pipeline:
             Filename = MainFile
         else:
             print("File Not Found")
+        Stabilization = _load_stabilization()
         Stabilization(Filename, New_FileName, SMOOTHING_RADIUS)
         print("Video Stabilization Done..\n")
 
@@ -55,6 +81,7 @@ class pipeline:
             Filename = MainFile.split(".")[0] + "_Stabilized.mp4"
         else:
             Filename = MainFile
+        VideoCompression = _load_video_compression()
         compress = VideoCompression(Filename, New_FileName)
         if compress:
             print("Video Compression Done..\n")
@@ -71,6 +98,7 @@ class pipeline:
             Filename = MainFile.split(".")[0] + "_Stabilized.mp4"
         else:
             Filename = MainFile
+        FaceExtraction = _load_face_extraction()
         FaceExtraction(Filename, New_FileName, correctionFactor_Face)
         print("Face Extraction Done...\n")
 
@@ -88,6 +116,7 @@ class pipeline:
             Filename = MainFile.split(".")[0] + "_Stabilized.mp4"
         else:
             Filename = MainFile
+        LipExtraction = _load_lip_extraction()
         LipExtraction(Filename, New_FileName, correctionFactor_Lip)
         print("Lip Extraction Done..\n")
 
@@ -101,6 +130,7 @@ class pipeline:
             Filename = MainFile.split(".")[0] + "_FaceDetector.mp4"
         else:
             print("File does not exist")
+        FrequencyCalculation = _load_frequency_calculation()
         frequency_total, errors, sweeps_mode, sweeps_mean, stdev, fps, time_slice = FrequencyCalculation(Filename
                                                                                                          , threshold,
                                                                                                          thresh_iterations,
@@ -119,11 +149,26 @@ class pipeline:
         print("#############Frequency Calcualtion Ends###############\n")
 
     def callPerformAll(self, MainFile, SMOOTHING_RADIUS, threshold, thresh_iterations, visual_area, disp,
-                       correctionFactor_Face, correctionFactor_Lip, model):
+                       correctionFactor_Face, correctionFactor_Lip, model, save_in_excel=True, time_slice=5):
         print("Starting....\n")
-        self.CUI(MainFile, True, True, True, True, True, SMOOTHING_RADIUS, threshold, thresh_iterations, visual_area,
-                 disp
-                 , correctionFactor_Face, correctionFactor_Lip, model)
+        self.CUI(
+            MainFile,
+            True,
+            True,
+            True,
+            True,
+            True,
+            threshold,
+            thresh_iterations,
+            visual_area,
+            disp,
+            correctionFactor_Face,
+            correctionFactor_Lip,
+            save_in_excel,
+            time_slice,
+            model,
+            SMOOTHING_RADIUS
+        )
         print("Done!\n\n")
 
     def CUI(self, MainFile, Stabilize, Video_Compression,

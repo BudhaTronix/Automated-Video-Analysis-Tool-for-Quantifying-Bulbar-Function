@@ -1,24 +1,58 @@
 import json
+from pathlib import Path
+
 import PySimpleGUI as sg
-from Pipeline import pipeline
+
+try:
+    from Codes.Pipeline import pipeline
+except ImportError:
+    from Pipeline import pipeline
+
+BASE_DIR = Path(__file__).resolve().parent
+TEMP_JSON_PATH = BASE_DIR / "temp.json"
+
+
+def _as_bool(value):
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() == "true"
+    return bool(value)
+
 
 class GUI:
     def __init__(self, model):
         self.model = model
 
     def readJSON(self):
-        with open('temp.json', 'r') as openfile:
+        if not TEMP_JSON_PATH.exists():
+            defaults = {
+                "0": 50,
+                "1": "0",
+                "2": 1200,
+                "3": 800,
+                "4": 30,
+                "5": 30,
+                "6": 40,
+                "7": 5,
+                "8": "true",
+                "9": "37a.mov",
+            }
+            with TEMP_JSON_PATH.open("w", encoding="utf-8") as outfile:
+                json.dump(defaults, outfile)
+
+        with TEMP_JSON_PATH.open("r", encoding="utf-8") as openfile:
             json_object = json.load(openfile)
             values = json_object
-            SMOOTHING_RADIUS = values['0']
-            visual_area = values['1']
-            Height_Vid = values['2']
-            Width_Vid = values['3']
-            correctionFactor_Lip = values['4']
-            correctionFactor_Face = values['5']
-            threshold = values['6']
-            time_slice = values['7']
-            save_in_excel = values['8']
+            SMOOTHING_RADIUS = int(values['0'])
+            visual_area = int(values['1'])
+            Height_Vid = int(values['2'])
+            Width_Vid = int(values['3'])
+            correctionFactor_Lip = int(values['4'])
+            correctionFactor_Face = int(values['5'])
+            threshold = int(values['6'])
+            time_slice = int(values['7'])
+            save_in_excel = _as_bool(values['8'])
             MainFile = values['9']
 
         return SMOOTHING_RADIUS, visual_area, Height_Vid, Width_Vid, correctionFactor_Lip, correctionFactor_Face, \
@@ -60,7 +94,7 @@ class GUI:
         button, values = window.Read()
 
         window.close()
-        with open("temp.json", "w") as outfile:
+        with TEMP_JSON_PATH.open("w", encoding="utf-8") as outfile:
             json.dump(values, outfile)
 
     def loaderFunc(self):
