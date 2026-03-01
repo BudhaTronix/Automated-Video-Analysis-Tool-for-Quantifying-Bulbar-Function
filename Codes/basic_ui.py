@@ -1,9 +1,47 @@
+import sys
+import importlib.util
 from pathlib import Path
 
 import streamlit as st
-from keras.models import load_model
 
-from Codes.Pipeline import pipeline
+try:
+    from keras.models import load_model
+except ImportError:
+    from tensorflow.keras.models import load_model
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
+CODE_DIR = Path(__file__).resolve().parent
+if str(CODE_DIR) not in sys.path:
+    sys.path.insert(0, str(CODE_DIR))
+
+
+def _load_pipeline_class():
+    try:
+        from Codes.Pipeline import pipeline as pipeline_cls
+        return pipeline_cls
+    except ModuleNotFoundError as exc:
+        if exc.name not in {"Codes", "Codes.Pipeline"}:
+            raise
+
+    try:
+        from Pipeline import pipeline as pipeline_cls
+        return pipeline_cls
+    except ModuleNotFoundError as exc:
+        if exc.name != "Pipeline":
+            raise
+
+    spec = importlib.util.spec_from_file_location("Pipeline", CODE_DIR / "Pipeline.py")
+    if spec is None or spec.loader is None:
+        raise ImportError("Unable to load Pipeline.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.pipeline
+
+
+pipeline = _load_pipeline_class()
 
 
 def _resolve_model_path():
@@ -89,4 +127,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

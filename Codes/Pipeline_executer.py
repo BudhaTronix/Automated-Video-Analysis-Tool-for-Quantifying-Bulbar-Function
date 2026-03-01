@@ -2,7 +2,10 @@ import glob
 import os
 from pathlib import Path
 
-from keras.models import load_model
+try:
+    from keras.models import load_model
+except ImportError:
+    from tensorflow.keras.models import load_model
 
 try:
     from Codes.Pipeline import pipeline

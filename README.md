@@ -57,7 +57,7 @@ python Codes/Pipeline_executer.py
 ### 2. Basic Web UI (Streamlit)
 
 ```bash
-streamlit run Codes/basic_ui.py
+python -m streamlit run Codes/basic_ui.py
 ```
 
 ### 3. CLI Runner

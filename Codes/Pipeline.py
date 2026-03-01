@@ -4,31 +4,46 @@ from os import path
 
 
 def _load_stabilization():
-    from Codes.src.Stabilization import Stabilization
+    try:
+        from Codes.src.Stabilization import Stabilization
+    except ImportError:
+        from src.Stabilization import Stabilization
 
     return Stabilization
 
 
 def _load_video_compression():
-    from Codes.src.VideoCompression import VideoCompression
+    try:
+        from Codes.src.VideoCompression import VideoCompression
+    except ImportError:
+        from src.VideoCompression import VideoCompression
 
     return VideoCompression
 
 
 def _load_face_extraction():
-    from Codes.src.FaceExtraction import FaceExtraction
+    try:
+        from Codes.src.FaceExtraction import FaceExtraction
+    except ImportError:
+        from src.FaceExtraction import FaceExtraction
 
     return FaceExtraction
 
 
 def _load_lip_extraction():
-    from Codes.src.LipExtraction import LipExtraction
+    try:
+        from Codes.src.LipExtraction import LipExtraction
+    except ImportError:
+        from src.LipExtraction import LipExtraction
 
     return LipExtraction
 
 
 def _load_frequency_calculation():
-    from Codes.src.FrequencyCalculator import FrequencyCalculation
+    try:
+        from Codes.src.FrequencyCalculator import FrequencyCalculation
+    except ImportError:
+        from src.FrequencyCalculator import FrequencyCalculation
 
     return FrequencyCalculation
 

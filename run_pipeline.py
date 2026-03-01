@@ -1,8 +1,6 @@
 import argparse
 from pathlib import Path
 
-from keras.models import load_model
-
 from Codes.Pipeline import pipeline
 
 
@@ -48,6 +46,11 @@ def main():
     if not input_video.exists():
         raise FileNotFoundError(f"Input video not found: {input_video}")
 
+    try:
+        from keras.models import load_model
+    except ImportError:
+        from tensorflow.keras.models import load_model
+
     model_path = _resolve_model_path(args.model)
     model = load_model(str(model_path), compile=False)
 
@@ -74,4 +77,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
